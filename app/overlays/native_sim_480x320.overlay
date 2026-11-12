@@ -1,0 +1,11 @@
+/*
+ * Copyright (c) 2026 Muhammad Waleed Badar
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * A 480x320 display for native_sim:
+ *   west build ... -- -DEXTRA_DTC_OVERLAY_FILE=overlays/native_sim_480x320.overlay
+ */
+&sdl_dc {
+	width = <480>;
+	height = <320>;
+};

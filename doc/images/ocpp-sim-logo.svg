@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2026 Muhammad Waleed Badar
+  SPDX-License-Identifier: Apache-2.0
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96" role="img" aria-label="ocpp-sim">
+  <rect width="96" height="96" rx="22" fill="#14181b"/>
+  <circle cx="48" cy="48" r="31" fill="none" stroke="#2a3036" stroke-width="6"/>
+  <path d="M53 18 30 52h15l-4 26 25-36H50z" fill="#34d17f"/>
+</svg>

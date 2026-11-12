@@ -1,0 +1,13 @@
+# Copyright (c) 2026 Muhammad Waleed Badar
+# SPDX-License-Identifier: Apache-2.0
+
+common:
+  tags:
+    - ocpp
+tests:
+  app.ocpp_sim.evse:
+    platform_allow:
+      - native_sim/native/64
+      - qemu_cortex_m3
+    integration_platforms:
+      - native_sim/native/64

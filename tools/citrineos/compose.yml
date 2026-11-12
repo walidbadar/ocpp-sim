@@ -1,0 +1,80 @@
+# Copyright (c) 2026 Muhammad Waleed Badar
+# SPDX-License-Identifier: Apache-2.0
+#
+# A local CitrineOS (https://github.com/citrineos/citrineos-core) to point
+# the simulator at: the OCPP server with RabbitMQ and PostgreSQL, from the
+# published images. Trimmed from the docker-compose.yml of citrineos-core
+# (Apache-2.0): no operator UI, no Hasura, no certificate authorities, the
+# database in a named volume.
+#
+#   docker compose -f tools/citrineos/compose.yml up -d
+#   podman compose -f tools/citrineos/compose.yml up -d
+#
+#   ws://127.0.0.1:8081/<charge box id>   OCPP 1.6 and 2.x, no authentication,
+#                                         unknown charging stations accepted
+#   http://127.0.0.1:8080/docs            REST API (Swagger)
+#
+# The ports listen on this machine only. A board on the network needs
+# CITRINEOS_BIND=0.0.0.0, which also opens the REST API below: it runs
+# without authentication (CITRINEOS_AUTH_MODE=localBypass). This is a test
+# bench, not a deployment.
+
+name: ocpp-sim-citrineos
+
+services:
+  citrine:
+    image: ghcr.io/citrineos/citrineos-server:${CITRINEOS_TAG:-v2.1.0}
+    environment:
+      APP_NAME: 'all'
+      DB_STRATEGY: 'migrate'
+      CITRINEOS_HOST: '0.0.0.0'
+      CITRINEOS_DATABASE_HOST: 'ocpp-db'
+      CITRINEOS_MESSAGEBROKER_AMQP_URL: 'amqp://guest:guest@amqp-broker:5672'
+      CITRINEOS_TIMEOUTS_MAXCALLLENGTHSECONDS: '20'
+      CITRINEOS_FILEACCESS_LOCAL_DEFAULTFILEPATH: '/usr/local/apps/citrineos/apps/ocpp-server/dist/assets'
+      CITRINEOS_SWAGGER_LOGOPATH: '/usr/local/apps/citrineos/apps/ocpp-server/dist/assets/logo.png'
+      # tools/citrine.py calls the REST API without a token
+      CITRINEOS_AUTH_MODE: 'localBypass'
+    depends_on:
+      ocpp-db:
+        condition: service_healthy
+      amqp-broker:
+        condition: service_healthy
+    ports:
+      - ${CITRINEOS_BIND:-127.0.0.1}:8080:8080
+      - ${CITRINEOS_BIND:-127.0.0.1}:8081:8081
+      - ${CITRINEOS_BIND:-127.0.0.1}:8082:8082
+
+  amqp-broker:
+    image: docker.io/library/rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: 'guest'
+      RABBITMQ_DEFAULT_PASS: 'guest'
+    healthcheck:
+      # As the broker's own user: run as root before the broker is up, the
+      # check creates an Erlang cookie the broker then cannot read (Podman
+      # runs the first check right at the start).
+      test: ['CMD-SHELL', 'gosu rabbitmq rabbitmq-diagnostics -q check_port_connectivity']
+      interval: 10s
+      timeout: 10s
+      retries: 6
+      start_period: 20s
+
+  ocpp-db:
+    image: docker.io/postgis/postgis:16-3.5
+    platform: linux/amd64
+    environment:
+      POSTGRES_DB: citrine
+      POSTGRES_USER: citrine
+      POSTGRES_PASSWORD: 'citrine'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -h 127.0.0.1 -p 5432 -U citrine -d citrine']
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+volumes:
+  pgdata:

@@ -1,0 +1,16 @@
+# Copyright (c) 2026 Muhammad Waleed Badar
+# SPDX-License-Identifier: Apache-2.0
+
+sample:
+  name: OCPP charge point simulator
+tests:
+  app.ocpp_sim:
+    build_only: true
+    platform_allow:
+      - native_sim/native/64
+      - uedx32480035e_wb_a/esp32s3/procpu
+    integration_platforms:
+      - native_sim/native/64
+    tags:
+      - ocpp
+      - lvgl

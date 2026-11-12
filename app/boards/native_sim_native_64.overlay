@@ -1,0 +1,10 @@
+/*
+ * Copyright (c) 2026 Muhammad Waleed Badar
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * A 800x480 window; overlays/ has the geometry of smaller displays.
+ */
+&sdl_dc {
+	width = <800>;
+	height = <480>;
+};

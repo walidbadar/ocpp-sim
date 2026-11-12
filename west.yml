@@ -1,0 +1,26 @@
+# Copyright (c) 2026 Muhammad Waleed Badar
+# SPDX-License-Identifier: Apache-2.0
+#
+# West manifest: with this repository as the manifest repository,
+# "west update" fetches Zephyr and the modules the simulator needs: LVGL
+# for the display, Mbed TLS (with TF-PSA-Crypto) for the WebSocket client,
+# and the Espressif HAL for the ESP32-S3 board.
+
+manifest:
+  self:
+    path: ocpp-sim
+
+  remotes:
+    - name: zephyrproject-rtos
+      url-base: https://github.com/zephyrproject-rtos
+
+  projects:
+    - name: zephyr
+      remote: zephyrproject-rtos
+      revision: main
+      import:
+        name-allowlist:
+          - hal_espressif
+          - lvgl
+          - mbedtls
+          - tf-psa-crypto

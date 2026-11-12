@@ -1,0 +1,91 @@
+# Copyright (c) 2026 Muhammad Waleed Badar
+# SPDX-License-Identifier: Apache-2.0
+
+mainmenu "OCPP charge point simulator"
+
+config OCPP_SIM_APP_CONNECTORS
+	int "Number of connectors"
+	default 2
+	range 1 4
+
+config OCPP_SIM_APP_MAX_POWER_W
+	int "Rating of a connector (W)"
+	default 11000
+	range 1 1000000
+
+config OCPP_SIM_APP_VOLTAGE_V
+	int "Phase voltage (V)"
+	default 230
+	range 1 1000
+
+config OCPP_SIM_APP_PHASES
+	int "Number of phases"
+	default 3
+	range 1 3
+
+config OCPP_SIM_APP_AUTH_TIMEOUT_S
+	int "Drop an accepted identifier if no EV plugs in (s)"
+	default 30
+	range 1 3600
+	help
+	  The ConnectionTimeOut of OCPP 1.6.
+
+config OCPP_SIM_APP_URL
+	string "Backend URL until one is saved"
+	default "ws://127.0.0.1:8081"
+	help
+	  ws://host[:port][/path] of the central system. The charge box
+	  identity is appended as the last path segment. The default is the
+	  unauthenticated WebSocket server of a local CitrineOS
+	  (tools/citrineos/compose.yml). Empty: the simulator waits until a
+	  URL is entered on the display or with "sim url".
+
+config OCPP_SIM_APP_CHARGE_BOX_ID
+	string "Charge box identity until one is saved"
+	default "zephyr-sim-01"
+
+config OCPP_SIM_APP_ID_TAG_PREFIX
+	string "Identifier (RFID) presented at a connector until one is saved"
+	default "ZEPHYR-"
+	help
+	  The connector number is appended: ZEPHYR-1, ZEPHYR-2. At most 19
+	  characters. The central system has to know the identifiers, see
+	  tools/citrine.py.
+
+config OCPP_SIM_APP_VENDOR
+	string "chargePointVendor of the BootNotification (at most 20 characters)"
+	default "Zephyr"
+
+config OCPP_SIM_APP_MODEL
+	string "chargePointModel of the BootNotification (at most 20 characters)"
+	default "ocpp-sim"
+
+config OCPP_SIM_APP_SERIAL
+	string "chargePointSerialNumber of the BootNotification (at most 25 characters)"
+	default "SIM-0001"
+
+config OCPP_SIM_APP_REQUEST_TIMEOUT_MS
+	int "Time to wait for the answer to Authorize, Start- and StopTransaction (ms)"
+	default 8000
+
+config OCPP_SIM_APP_SNTP_SERVER
+	string "SNTP server for the timestamps"
+	default "pool.ntp.org"
+	depends on SNTP
+
+config OCPP_SIM_APP_PEEK
+	bool "Read link state and transaction id from the OCPP library's internals"
+	default y
+	help
+	  The library has no API for "is the central system connected" or
+	  for the transaction id it got from StartTransaction. With this
+	  option app/src/ocpp_peek.c includes the library's private header
+	  and reads them from its structures. Disable it if that header
+	  changes; the display then shows the link state it can infer from
+	  the requests and no transaction id.
+
+config OCPP_SIM_APP_THREAD_STACK_SIZE
+	int "Stack of the thread that talks to the central system"
+	default 6144
+
+source "Kconfig.zephyr"
